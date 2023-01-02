@@ -1,0 +1,4 @@
+name: Custom Preloader
+type: module
+description: Associates to create own preload animation
+core_version_requirement: ^8 || ^9 || ^10
