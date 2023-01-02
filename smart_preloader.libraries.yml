@@ -1,0 +1,10 @@
+preloader:
+  version: 1.x
+  css:
+    theme:
+      css/preloader.css: {}
+  js:
+    js/preloader.js: {}
+
+page_attached:
+  - preloader

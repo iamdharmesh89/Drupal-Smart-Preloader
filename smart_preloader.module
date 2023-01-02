@@ -1,0 +1,6 @@
+function smart_preloader_preloader() {
+  $output = '<div id="preloader">';
+  $output .= '<div class="preloader-icon"></div>';
+  $output .= '</div>';
+  return $output;
+}

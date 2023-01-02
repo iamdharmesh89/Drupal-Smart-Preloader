@@ -1,0 +1,4 @@
+name: Smart Preloader Drupal
+type: module
+description: Create a preloader for site
+core_version_requirement: ^8 || ^9 || ^10
