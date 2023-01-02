@@ -1,0 +1,46 @@
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function custom_loader_form_system_configuration_form_alter(&$form, Drupal\Core\Form\FormStateInterface $form_state) {
+  $form['custom_loader_preloader'] = array(
+    '#type' => 'details',
+    '#title' => t('Preloader'),
+  );
+  $form['custom_loader_preloader']['html'] = array(
+    '#type' => 'textarea',
+    '#title' => t('HTML'),
+    '#default_value' => \Drupal::config('custom_loader.settings')->get('html'),
+  );
+  $form['custom_loader_preloader']['css'] = array(
+    '#type' => 'textarea',
+    '#title' => t('CSS'),
+    '#default_value' => \Drupal::config('custom_loader.settings')->get('css'),
+  );
+  $form['#submit'][] = 'custom_loader_form_submit';
+}
+
+/**
+ * Form submit handler.
+ */
+function custom_loader_form_submit(array &$form, Drupal\Core\Form\FormStateInterface $form_state) {
+  \Drupal::configFactory()->getEditable('custom_loader.settings')
+    ->set('html', $form_state->getValue('html'))
+    ->set('css', $form_state->getValue('css'))
+    ->save();
+}
+
+/**
+ * Displays the preloader.
+ */
+function custom_loader_preloader() {
+  $html = \Drupal::config('custom_loader.settings')->get('html');
+  $css = \Drupal::config('custom_loader.settings')->get('css');
+  drupal_add_css($css, array('type' => 'inline'));
+  return $html;
+}
+
+
+
+<!-- To display the preloader on your site, you will need to add a call to the module_name_preloader() 
+function to your site's theme template files. For example, you might add the following line to
+ your theme's page.html.twig template file: -->
