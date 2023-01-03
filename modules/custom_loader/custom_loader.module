@@ -1,28 +1,36 @@
+<?php
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * Implements hook_form_FORM_ID_alter().
  */
-function custom_loader_form_system_configuration_form_alter(&$form, Drupal\Core\Form\FormStateInterface $form_state) {
-  $form['custom_loader_preloader'] = array(
+function custom_loader_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+    // Check if the current route is the Performance page.
+  $route_match = \Drupal::routeMatch();
+  if ($route_match->getRouteName() == 'system.performance_settings') {
+  $form['custom_loader_preloader'] = [
     '#type' => 'details',
     '#title' => t('Preloader'),
-  );
-  $form['custom_loader_preloader']['html'] = array(
+  ];
+  $form['custom_loader_preloader']['html'] = [
     '#type' => 'textarea',
     '#title' => t('HTML'),
     '#default_value' => \Drupal::config('custom_loader.settings')->get('html'),
-  );
-  $form['custom_loader_preloader']['css'] = array(
+  ];
+  $form['custom_loader_preloader']['css'] = [
     '#type' => 'textarea',
     '#title' => t('CSS'),
     '#default_value' => \Drupal::config('custom_loader.settings')->get('css'),
-  );
+  ];
+  $form['actions']['submit'] = [  '#type' => 'submit',  '#value' => t('Save'),];
   $form['#submit'][] = 'custom_loader_form_submit';
+  }
 }
 
 /**
  * Form submit handler.
  */
-function custom_loader_form_submit(array &$form, Drupal\Core\Form\FormStateInterface $form_state) {
+function custom_loader_form_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
   \Drupal::configFactory()->getEditable('custom_loader.settings')
     ->set('html', $form_state->getValue('html'))
     ->set('css', $form_state->getValue('css'))
@@ -30,17 +38,40 @@ function custom_loader_form_submit(array &$form, Drupal\Core\Form\FormStateInter
 }
 
 /**
- * Displays the preloader.
+ * Implements hook_page_attachments().
  */
-function custom_loader_preloader() {
+function custom_loader_page_attachments(array &$attachments) {
   $html = \Drupal::config('custom_loader.settings')->get('html');
   $css = \Drupal::config('custom_loader.settings')->get('css');
-  drupal_add_css($css, array('type' => 'inline'));
-  return $html;
+  $attachments['#attached']['html_head'][] = [
+    [
+      '#markup' => $html,
+      '#type' => 'inline_template',
+    ],
+    'custom_loader_html',
+  ];
+  $attachments['#attached']['html_head'][] = [
+    [
+      '#markup' => $css,
+      '#type' => 'inline_template',
+    ],
+    'custom_loader_css',
+  ];
 }
 
-
-
-<!-- To display the preloader on your site, you will need to add a call to the module_name_preloader() 
-function to your site's theme template files. For example, you might add the following line to
- your theme's page.html.twig template file: -->
+/**
+ * Implements hook_menu().
+ */
+function custom_loader_menu() {
+  $items = [];
+  $items['admin/config/system/custom_loader'] = array(
+    'title' => 'Custom Loader',
+    'description' => 'Configure the module.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('custom_loader_form_alter'),
+    'access callback' => TRUE,
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
