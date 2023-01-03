@@ -43,21 +43,15 @@ function custom_loader_form_submit(&$form, \Drupal\Core\Form\FormStateInterface 
 function custom_loader_page_attachments(array &$attachments) {
   $html = \Drupal::config('custom_loader.settings')->get('html');
   $css = \Drupal::config('custom_loader.settings')->get('css');
-  $attachments['#attached']['html_head'][] = [
-    [
-      '#markup' => $html,
-      '#type' => 'inline_template',
-    ],
+  $attachments['#attached']['html_head'][] = [    [      '#markup' => $html,      '#type' => 'inline_template',    ],
     'custom_loader_html',
   ];
-  $attachments['#attached']['html_head'][] = [
-    [
-      '#markup' => $css,
-      '#type' => 'inline_template',
-    ],
+  $attachments['#attached']['html_head'][] = [    [     '#markup' => $css,      '#type' => 'inline_template',    ],
     'custom_loader_css',
   ];
+  $attachments['#attached']['library'][] = 'custom_loader/preloader';
 }
+
 
 /**
  * Implements hook_menu().
